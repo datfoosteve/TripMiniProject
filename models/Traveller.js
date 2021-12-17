@@ -1,43 +1,38 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
 
-class Car extends Model {}
+// create our Traveller model
+class Traveller extends Model {}
 
-Car.init(
+// create fields/columns for Traveller model
+Traveller.init(
   {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
-    make: {
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    model: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    mileage: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    driver_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'driver',
-        key: 'id',
-      },
-    },
+      unique: true,
+      validate: {
+        isEmail: true
+      }
+    }
   },
   {
     sequelize,
     timestamps: false,
     freezeTableName: true,
     underscored: true,
-    modelName: 'car',
+    modelName: 'traveller'
   }
 );
 
-module.exports = Car;
+module.exports = Traveller;
