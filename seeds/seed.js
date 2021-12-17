@@ -1,25 +1,37 @@
 const sequelize = require('../config/connection');
-const { Driver, License, Car } = require('../models');
+const { Traveller, Location, Trip } = require('../models');
 
-const driverSeedData = require('./driverSeedData.json');
-const carSeedData = require('./carSeedData.json');
+const travellerSeedData = require('./travellerSeedData.json');
+const locationSeedData = require('./locationSeedData.json');
 
 const seedDatabase = async () => {
   await sequelize.sync({ force: true });
 
-  const drivers = await Driver.bulkCreate(driverSeedData);
+  const travellers = await Traveller.bulkCreate(travellerSeedData);
 
-  for (const { id } of drivers) {
-    const newLicense = await License.create({
-      driver_id: id,
-    });
-  }
+  const locations = await Location.bulkCreate(locationSeedData);
 
-  for (const car of carSeedData) {
-    const newCar = await Car.create({
-      ...car,
-      // Attach a random driver ID to each car
-      driver_id: drivers[Math.floor(Math.random() * drivers.length)].id,
+  // Create trips at random
+  for (let i = 0; i < 10; i++) {
+    // Get a random traveller's `id`
+    const { id: randomTravellerId } = travellers[
+      Math.floor(Math.random() * travellers.length)
+    ];
+
+    // Get a random location's `id`
+    const { id: randomLocationId } = locations[
+      Math.floor(Math.random() * locations.length)
+    ];
+
+    // Create a new trip with random `trip_budget` and `traveller_amount` values, but with ids selected above
+    await Trip.create({
+      trip_budget: (Math.random() * 10000 + 1000).toFixed(2),
+      traveller_amount: Math.floor(Math.random() * 10) + 1,
+      traveller_id: randomTravellerId,
+      location_id: randomLocationId,
+    }).catch((err) => {
+      // If there's an error, such as the same random pairing of `traveller.id` and `location.id` occurring and we get a constraint error, don't quit the Node process
+      console.log(err);
     });
   }
 

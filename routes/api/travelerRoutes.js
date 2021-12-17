@@ -21,11 +21,11 @@ router.get('/:id', async (req, res) => {
     });
 
     if (!travellerData) {
-      res.status(404).json({ message: 'No driver found with that id!' });
+      res.status(404).json({ message: 'No Traveler found with that id!' });
       return;
     }
 
-    res.status(200).json(driverData);
+    res.status(200).json(travellerData);
   } catch (err) {
     res.status(500).json(err);
   }
